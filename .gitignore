@@ -1,0 +1,27 @@
+# Folders
+/new_data
+/parms_pc
+/results
+/data_teste
+/scripts/multithread
+/build
+/parms
+/data
+.vscode
+/results/Network
+/data_new
+parms_pc_80000
+/parms_pc_100000
+scripts/N_100000_multithread_pc.sh
+scripts/python/multithread_assortativity_alpha_a.sh
+scripts/python/multithread_assortativity_alpha_g.sh
+parms_pc_40000
+scripts/N_40000_multithread_pc.sh
+
+
+# Files
+/scripts/run_all_script.txt
+
+
+
+
