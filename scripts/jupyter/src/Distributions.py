@@ -146,83 +146,6 @@ def kappa(alpha_a,d):
     else:
         return round(-1.15*np.exp(1-alpha_a/d)+1.45,4)
 
-# def all_degree_GML(N,dim,alpha_a,alpha_g):
-#     path = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}"
-    
-#     isExistAll = os.path.exists(path+"/all_files")
-    
-#     # If file in all_files, create check_folder to move files
-#     if not os.path.exists(path + "/gml/check"):
-#         os.makedirs(path + "/gml/check")
-#     else:
-#         pass
-    
-#     if(isExistAll == False):
-#         os.mkdir(path+"/all_files")       
-#         degrees = []
-#         all_files = glob.glob(os.path.join(path + "/gml","*.gml.gz"))
-#         print(f"N = {N}, dim = {dim}, alpha_a = {alpha_a}, alpha_g = {alpha_g}")
-#         i = 1
-#         for file in all_files:
-#             file_name = os.path.basename(file)
-            
-#             with open(file, 'rb') as file_in:
-#                 # decompress gzip
-#                 with gzip.GzipFile(fileobj=file_in, mode='rb') as gzip_file:
-#                     for line in gzip_file:
-#                         # decode file
-#                         line = line.decode('utf-8')
-#                         if(line[:6]=="degree"):
-#                             degrees.append(int(line[7:]))
-                       
-#             # move file to check_folder
-#             shutil.move(file, path + "/gml/check/" + file_name)
-#             print(f"{len(all_files)} files, {len(all_files)-i} files remaning")
-#             i += 1
-            
-#         df_degree = pd.DataFrame(data={"degree":degrees})
-#         df_degree.to_csv(path + "/all_files/degree_all.csv",index=False)
-#         clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook
-#     else:
-        
-#         df_degree = pd.read_csv(path + "/all_files/degree_all.csv")
-        
-#         all_files = glob.glob(os.path.join(path + "/gml","*.gml.gz"))
-        
-#         my_files = set(all_files)
-        
-#         if(len(my_files)==0):
-#             total_files = glob.glob(os.path.join(path + "/gml/check","*.gml.gz"))
-#             print(f"N = {N}, dim = {dim}, alpha_a = {alpha_a}, alpha_g = {alpha_g}")
-#             print(f"file update with {len(total_files)} files")
-#             clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook
-#         else:
-#             print(f"N = {N}, dim = {dim}, alpha_a = {alpha_a}, alpha_g = {alpha_g}")
-#             degrees_dict = defaultdict(list)
-            
-#             count_new_data = 1
-            
-#             for file in my_files:
-#                 file_name = os.path.basename(file)
-                
-#                 count_new_data += 1
-#                 degrees = [] # aux degree
-                        
-#                 with open(file, 'rb') as file_in:
-#                     with gzip.GzipFile(fileobj=file_in, mode='rb') as gzip_file:
-#                         for line in gzip_file:
-#                             line = line.decode('utf-8')
-#                             if(line[:6]=="degree"):
-#                                 degrees.append(int(line[7:]))
-#                 shutil.move(file, path + "/gml/check/" + file_name)       
-                
-#                 degrees_dict['degree'].extend(degrees)                
-#                 df_degree = pd.concat([df_degree, pd.DataFrame(degrees_dict)], ignore_index=True)
-#                 print(f"{len(my_files)} new files, {len(my_files)-count_new_data} remaining files")
-                
-#             df_degree.to_csv(path + "/all_files/degree_all.csv",index=False,mode='w')
-#             clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook
-
 def reset_gml_folder(N,dim,alpha_a,alpha_g):
     path = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/gml/check"
     path_o = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/gml/"
@@ -231,7 +154,6 @@ def reset_gml_folder(N,dim,alpha_a,alpha_g):
     
     for file in all_files:
         shutil.move(file, path_o + os.path.basename(file))
-
 
 def find_order_of_magnitude(number):
     order = int(math.floor(math.log10(abs(number))))
