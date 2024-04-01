@@ -196,6 +196,7 @@ def create_all_properties_file(N,dim,alpha_a,alpha_g,alpha_g_variable):
         sorted_df.to_csv(f"../../data/N_{N}/dim_{dim}/properties_all_alpha_g_{alpha_g}.txt",sep = ' ',index=False,mode="w+")
 
 
+# Linear regression with errors in parameters
 def linear_regression(X,Y,Erro_Y,Parameter):
     # Dados de exemplo
     x = X
@@ -212,8 +213,12 @@ def linear_regression(X,Y,Erro_Y,Parameter):
     intercept = coefficients[1]
     slope_error = np.sqrt(cov_matrix[0, 0])
     intercept_error = np.sqrt(cov_matrix[1, 1])
-    if(Parameter==True):
-        return slope, slope_error
+    
+    # Return a, b, a_err, b_err
+    if( Parameter == True):
+        return slope, intercept, slope_error, intercept_error
+    
+    # Return y, where y = a*x + b
     else:
         return intercept + slope*x
 

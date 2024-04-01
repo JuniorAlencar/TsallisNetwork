@@ -218,7 +218,8 @@ def list_all_folders(N,dim):
         if(term_==24):
             set_parms.append((lst_folders[i][8:12],lst_folders[i][21:]))
     return set_parms
-    
+
+# Create and save dataframe with Beta values (Propertie = Beta*log10(N) + Gamma)
 def beta_all(dataframe_filter, List_N):    
     # Dict to load beta_values with parameters
     properties_dict = {"alpha_a":[], "alpha_g":[], "dim":[],
@@ -268,26 +269,72 @@ def beta_all(dataframe_filter, List_N):
             ass_coeff_mean_err.append(dataframe_filter["ass_coeff_err"].iloc[idx_values_N])
         
         # Calcule of linear regression with errors (beta, beta_err)
-        beta_short, beta_short_err = linear_regression(np.log10(List_N), 
+        beta_short = linear_regression(np.log10(List_N), 
                                                     np.array(short_mean), np.array(short_mean_err), Parameter = True)
         
-        beta_diameter, beta_diameter_err = linear_regression(np.log10(List_N), 
+        beta_diameter = linear_regression(np.log10(List_N), 
                                                     np.array(diameter_mean), np.array(diameter_mean_err), Parameter = True)
         
-        beta_ass, beta_ass_err = linear_regression(np.log10(List_N), 
+        beta_ass = linear_regression(np.log10(List_N), 
                                                     np.array(ass_coeff_mean), np.array(ass_coeff_mean_err), Parameter = True)
         
         # Append values in dictionary
-        properties_dict["beta_short"].append(beta_short)
-        properties_dict["beta_short_err"].append(beta_short_err)
+        properties_dict["beta_short"].append(beta_short[0])
+        properties_dict["beta_short_err"].append(beta_short[2])
 
-        properties_dict["beta_diameter"].append(beta_diameter)
-        properties_dict["beta_diameter_err"].append(beta_diameter_err)
+        properties_dict["beta_diameter"].append(beta_diameter[0])
+        properties_dict["beta_diameter_err"].append(beta_diameter[2])
 
-        properties_dict["beta_assortativity"].append(beta_ass)
-        properties_dict["beta_assortativity_err"].append(beta_ass_err)
+        properties_dict["beta_assortativity"].append(beta_ass[0])
+        properties_dict["beta_assortativity_err"].append(beta_ass[2])
 
     # Create and save DataFrame with dictionary data
     df = pd.DataFrame(data=properties_dict)
     df.to_csv(f"../../data/all_beta.csv", sep = ',', mode = "w+", index = False)
     return df
+
+# Create and save dataframe with N* values (-> R(N*) = 0 <-)
+def assortativity_N(dataframe_filter, List_N):
+    # Dict to load beta_values with parameters
+    properties_dict = {"alpha_a":[], "alpha_g":[], "dim":[],
+                        "N*":[]}
+
+    # Create tuple with alpha_a, alpha_g, dim from dataframe_filter
+    index_dict_data = [(i, j, k) for i,j,k in zip(dataframe_filter['alpha_a'],
+                                                dataframe_filter['alpha_g'],
+                                                dataframe_filter['dim'])]
+    # Extract unique tuples using set
+    unique_tuples = set(index_dict_data)
+
+    # run for unique values of (alpha_a, alpha_g, dim)
+    for element in unique_tuples:
+        
+        # Lists to store assortativity and errors
+        ass_coeff_mean, ass_coeff_mean_err = [], []    
+        
+        # Append parameter values in dictionary
+        properties_dict["alpha_a"].append(element[0])
+        properties_dict["alpha_g"].append(element[1])
+        properties_dict["dim"].append(element[2])
+        
+        for n in List_N:
+            
+            # Select the index with unique (alpha_a, alpha_g, dim) for each n
+            idx_values_N = dataframe_filter[(dataframe_filter['alpha_a'] == element[0]) & 
+                            (dataframe_filter['alpha_g'] == element[1]) &
+                            (dataframe_filter['dim'] == element[2]) & 
+                            (dataframe_filter['n_size'] == n)].index[0]
+
+            ass_coeff_mean.append(dataframe_filter["ass_coeff_mean"].iloc[idx_values_N])
+            ass_coeff_mean_err.append(dataframe_filter["ass_coeff_err"].iloc[idx_values_N])
+        
+        beta_ass = linear_regression(np.log10(List_N), 
+                                                    np.array(ass_coeff_mean), np.array(ass_coeff_mean_err), Parameter = True)
+        
+        # N* = 10**(-Gamma/Beta), where: R = Beta*log10(N) + Gamma. -> R(N*) = 0 <-
+        properties_dict["N*"].append(10**(-beta_ass[1]/beta_ass[0]))
+
+    df = pd.DataFrame(data=properties_dict)
+    df.to_csv(f"../../data/all_N.csv", sep = ',', mode = "w+", index = False)
+    return df
+
