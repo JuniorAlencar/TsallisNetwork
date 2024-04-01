@@ -3,6 +3,7 @@ import glob
 import os
 import numpy as np
 from IPython.display import clear_output
+import math
 
 def all_properties_dataframe(N, dim, alpha_a, alpha_g):
     # Directory with all samples
@@ -338,3 +339,7 @@ def assortativity_N(dataframe_filter, List_N):
     df.to_csv(f"../../data/all_N.csv", sep = ',', mode = "w+", index = False)
     return df
 
+# Return order in number, b (number = c*10**b)
+def find_order_of_magnitude(number):
+    order = int(math.floor(math.log10(abs(number))))
+    return abs(order)  
