@@ -34,14 +34,19 @@ def all_properties_dataframe(N, dim, alpha_a, alpha_g):
             if(cond == True):
                 pass
             else:
-                df = pd.read_csv(file, sep=',')
+                # Read CSV file into a DataFrame
+                try:
+                    df = pd.read_csv(file, sep=',')
+                    df_all["#short_path"].append(df["#mean shortest path"].values[0])
+                    df_all["#diamater"].append(df["# diamater"].values[0])
+                    df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
 
-                df_all["#short_path"].append(df["#mean shortest path"].values[0])
-                df_all["#diamater"].append(df["# diamater"].values[0])
-                df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
-
-                file_names.append(os.path.basename(file))
-                count += 1
+                    file_names.append(os.path.basename(file))
+                    count += 1
+                
+                except pd.errors.EmptyDataError:
+                    # File is empty, remove it
+                    os.remove(file)
 
         if(count != 0):
             pall_df = pd.read_csv(path + "/properties_set.txt", sep=' ')
@@ -65,13 +70,19 @@ def all_properties_dataframe(N, dim, alpha_a, alpha_g):
         file_names = []
 
         for file in all_files:
-            df = pd.read_csv(file, sep=',')
-            df_all["#short_path"].append(df["#mean shortest path"].values[0])
-            df_all["#diamater"].append(df["# diamater"].values[0])
-            df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
-            file_names.append(os.path.basename(file))
-            print(f"{len(all_files)} files,{len(all_files) - n_values} remaning")
-            n_values += 1
+            
+            try:
+                df = pd.read_csv(file, sep=',')
+                df_all["#short_path"].append(df["#mean shortest path"].values[0])
+                df_all["#diamater"].append(df["# diamater"].values[0])
+                df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
+                file_names.append(os.path.basename(file))
+                print(f"{len(all_files)} files,{len(all_files) - n_values} remaning")
+                n_values += 1
+            
+            except pd.errors.EmptyDataError:
+                os.remove(file)
+            
         df_prop = pd.DataFrame(data=df_all)
         df_name = pd.DataFrame(data={"filename":file_names})
         df_prop.to_csv(path+new_file,sep=' ', index=False, mode="w+")
