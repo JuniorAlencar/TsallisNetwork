@@ -15,17 +15,16 @@ import numpy as np
 #         list_values.append(new_values)
 #     return list_values
 
-dim = [1,2,3,4]
-N = 80000
-alpha_a = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
-alpha_g = [0.1, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
-dim = [1 ,2, 3, 4]
-N_s = 30
+N = 5000
+N_s = 100
+df = pd.read_csv("rest_parms.txt", delimiter = ' ')
+alpha_a = [round(i,2) for i in df["alpha_a"].values]
+alpha_g = [round(i,2) for i in df["alpha_g"].values]
+dim = [i for i in df["dim"].values]
+interval = range(0,int(len(alpha_a)/2))
 
-for d in dim:
-    for i in alpha_a:
-        for j in alpha_g:
-            FunctionsFile.JsonGenerate(N, i, j, d)
-            FunctionsFile.ScriptGenerate(N, i, j, d, N_s)
-
+for i in interval:
+    FunctionsFile.JsonGenerate(N, alpha_a[i], alpha_g[i], dim[i])
+    FunctionsFile.ScriptGenerate(N, alpha_a[i], alpha_g[i], dim[i], N_s)
+                        
 FunctionsFile.text_terminal()
