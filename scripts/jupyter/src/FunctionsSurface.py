@@ -4,6 +4,7 @@ import os
 import numpy as np
 from IPython.display import clear_output
 import math
+import shutil
 
 def all_properties_dataframe(N, dim, alpha_a, alpha_g):
     # Directory with all samples
@@ -28,25 +29,32 @@ def all_properties_dataframe(N, dim, alpha_a, alpha_g):
         file_names = []
         
         count = 0
-        
-        for file in all_files:
-            cond = os.path.basename(file) in df_name["filename"].values
-            if(cond == True):
-                pass
-            else:
-                # Read CSV file into a DataFrame
-                try:
-                    df = pd.read_csv(file, sep=',')
-                    df_all["#short_path"].append(df["#mean shortest path"].values[0])
-                    df_all["#diamater"].append(df["# diamater"].values[0])
-                    df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
+        # Run code if /prop folder exist
+        try: 
+            for file in all_files:
+                cond = os.path.basename(file) in df_name["filename"].values
+                if(cond == True):
+                    pass
+                else:
+                    # Read CSV file into a DataFrame
+                    try:
+                        df = pd.read_csv(file, sep=',')
+                        df_all["#short_path"].append(df["#mean shortest path"].values[0])
+                        df_all["#diamater"].append(df["# diamater"].values[0])
+                        df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
 
-                    file_names.append(os.path.basename(file))
-                    count += 1
-                
-                except pd.errors.EmptyDataError:
-                    # File is empty, remove it
-                    os.remove(file)
+                        file_names.append(os.path.basename(file))
+                        count += 1
+                    
+                    except pd.errors.EmptyDataError:
+                        # File is empty, remove it
+                        os.remove(file)
+        
+        # Remove folder if /prop folder don't exist
+        except OSError:
+            # Folder empty, remove it
+            shutil.rmtree(f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}")
+                    
 
         if(count != 0):
             pall_df = pd.read_csv(path + "/properties_set.txt", sep=' ')
@@ -68,26 +76,32 @@ def all_properties_dataframe(N, dim, alpha_a, alpha_g):
                 "#ass_coeff":[]
                 }
         file_names = []
+        
+        # Run code if /prop folder exist
+        try:
+            for file in all_files:
+                
+                try:
+                    df = pd.read_csv(file, sep=',')
+                    df_all["#short_path"].append(df["#mean shortest path"].values[0])
+                    df_all["#diamater"].append(df["# diamater"].values[0])
+                    df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
+                    file_names.append(os.path.basename(file))
+                    print(f"{len(all_files)} files,{len(all_files) - n_values} remaning")
+                    n_values += 1
 
-        for file in all_files:
-            
-            try:
-                df = pd.read_csv(file, sep=',')
-                df_all["#short_path"].append(df["#mean shortest path"].values[0])
-                df_all["#diamater"].append(df["# diamater"].values[0])
-                df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
-                file_names.append(os.path.basename(file))
-                print(f"{len(all_files)} files,{len(all_files) - n_values} remaning")
-                n_values += 1
-            
-            except pd.errors.EmptyDataError:
-                os.remove(file)
-            
-        df_prop = pd.DataFrame(data=df_all)
-        df_name = pd.DataFrame(data={"filename":file_names})
-        df_prop.to_csv(path+new_file,sep=' ', index=False, mode="w+")
-        df_name.to_csv(path+"/filenames.txt",sep=' ', index=False, mode="w+")
-        clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook
+                except pd.errors.EmptyDataError:
+                    os.remove(file)
+            df_prop = pd.DataFrame(data=df_all)
+            df_name = pd.DataFrame(data={"filename":file_names})
+            df_prop.to_csv(path+new_file,sep=' ', index=False, mode="w+")
+            df_name.to_csv(path+"/filenames.txt",sep=' ', index=False, mode="w+")
+            clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook       
+                
+        # Remove folder if /prop folder don't exist
+        except OSError:
+            # Folder empty, remove it
+            shutil.rmtree(f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}")
 
 # Get the interval values
 def filter_dataframe(dataframe):

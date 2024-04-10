@@ -1,4 +1,6 @@
 # Folders
+__pycache__/
+
 /new_data
 /parms_pc
 /results
@@ -17,7 +19,8 @@ scripts/python/multithread_assortativity_alpha_a.sh
 scripts/python/multithread_assortativity_alpha_g.sh
 parms_pc_40000
 scripts/N_40000_multithread_pc.sh
-
+/parms_pc_5000
+/data_2
 
 # Files
 /scripts/run_all_script.txt

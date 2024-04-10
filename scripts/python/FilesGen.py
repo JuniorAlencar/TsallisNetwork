@@ -1,5 +1,6 @@
 import src.GenerateFunctions as FunctionsFile
 import numpy as np
+import pandas as pd
 
 # FunctionsFile defined in folder ./src
 #ScriptGenerate(N,alpha_a,alpha_g,dim,NumSamples) -> generate files .sh to run in cluster
@@ -21,10 +22,13 @@ df = pd.read_csv("rest_parms.txt", delimiter = ' ')
 alpha_a = [round(i,2) for i in df["alpha_a"].values]
 alpha_g = [round(i,2) for i in df["alpha_g"].values]
 dim = [i for i in df["dim"].values]
-interval = range(0,int(len(alpha_a)/2))
+interval = range(0,int(len(alpha_a)))
+
 
 for i in interval:
     FunctionsFile.JsonGenerate(N, alpha_a[i], alpha_g[i], dim[i])
     FunctionsFile.ScriptGenerate(N, alpha_a[i], alpha_g[i], dim[i], N_s)
+
                         
 FunctionsFile.text_terminal()
+
