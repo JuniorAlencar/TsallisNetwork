@@ -18,6 +18,7 @@ mpl.rcParams['axes.linewidth'] = 1.2 #set the value globally
 #from collections import Counter
 from IPython.display import clear_output
 import json
+import re
 
 
 def assortativity_calculate(N, dim, alpha_a, alpha_g):

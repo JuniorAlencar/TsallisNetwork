@@ -8,6 +8,7 @@ from decimal import Decimal, getcontext
 from IPython.display import clear_output
 import statsmodels.api as sm # Linear regression
 import shutil
+import re
 
 
 # create folder to results
@@ -99,6 +100,17 @@ def all_properties_dataframe(N, dim, alpha_a, alpha_g):
 
 
 
+# Open the folder string name and return (alpha_a_value, alpha_g_value)
+def extract_alpha_values(folder_name):
+    pattern = r"alpha_a_(-?\d+\.\d+)_alpha_g_(-?\d+\.\d+)"
+    match = re.match(pattern, folder_name)
+    if match:
+        alpha_a = float(match.group(1))
+        alpha_g = float(match.group(2))
+        return (alpha_a, alpha_g)
+    else:
+        return None, None
+
 # List all pair of (alpha_a,alpha_g) folders in (N,dim) folder
 def list_all_folders(N,dim):
     directory = f"../../data/N_{N}/dim_{dim}/"
@@ -107,12 +119,10 @@ def list_all_folders(N,dim):
         lst_folders.append(dirs)
     lst_folders = lst_folders[0]
     set_parms = []
+
     for i in range(len(lst_folders)):
-        term_ = len(lst_folders[i])
-        if(term_ == 23):
-            set_parms.append((lst_folders[i][8:11],lst_folders[i][20:]))
-        if(term_==24):
-            set_parms.append((lst_folders[i][8:12],lst_folders[i][21:]))
+        set_parms.append(extract_alpha_values(lst_folders[i]))
+
     return set_parms
 
 def list_all_folders_for_alpha_fixed(N,dim, alpha_a, alpha_g, alpha_g_variable):

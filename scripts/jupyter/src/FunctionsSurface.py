@@ -4,6 +4,7 @@ import os
 import numpy as np
 from IPython.display import clear_output
 import math
+import re
 import shutil
 
 def all_properties_dataframe(N, dim, alpha_a, alpha_g):
@@ -161,7 +162,7 @@ def list_all_folders_for_alpha_fixed(N,dim, alpha_a, alpha_g, alpha_g_variable):
     for i in range(len(lst_folders)):
         term_ = len(lst_folders[i])
         if(term_ == 23):
-            set_parms.append((lst_folders[i][8:11],lst_folders[i][20:]))
+            set_parms.append((lst_folders[i][8:10],lst_folders[i][20:]))
         if(term_== 24):
             set_parms.append((lst_folders[i][8:12],lst_folders[i][21:]))
 
@@ -229,6 +230,17 @@ def create_all_properties_file(N,dim,alpha_a,alpha_g,alpha_g_variable):
         sorted_df = df_all.sort_values(by='#alpha_a', key=lambda col: col.astype(float))  # Sort by converting to float
         sorted_df.to_csv(f"../../data/N_{N}/dim_{dim}/properties_all_alpha_g_{alpha_g}.txt",sep = ' ',index=False,mode="w+")
 
+# Open the folder string name and return (alpha_a_value, alpha_g_value)
+def extract_alpha_values(folder_name):
+    pattern = r"alpha_a_(-?\d+\.\d+)_alpha_g_(-?\d+\.\d+)"
+    match = re.match(pattern, folder_name)
+    if match:
+        alpha_a = float(match.group(1))
+        alpha_g = float(match.group(2))
+        return (alpha_a, alpha_g)
+    else:
+        return None, None
+
 # List all pair of (alpha_a,alpha_g) folders in (N,dim) folder
 def list_all_folders(N,dim):
     directory = f"../../data/N_{N}/dim_{dim}/"
@@ -237,12 +249,10 @@ def list_all_folders(N,dim):
         lst_folders.append(dirs)
     lst_folders = lst_folders[0]
     set_parms = []
+
     for i in range(len(lst_folders)):
-        term_ = len(lst_folders[i])
-        if(term_ == 23):
-            set_parms.append((lst_folders[i][8:11],lst_folders[i][20:]))
-        if(term_==24):
-            set_parms.append((lst_folders[i][8:12],lst_folders[i][21:]))
+        set_parms.append(extract_alpha_values(lst_folders[i]))
+
     return set_parms
 
 # Create and save dataframe with Beta values (Propertie = Beta*log10(N) + Gamma)
@@ -368,3 +378,16 @@ def assortativity_N(dataframe_filter, List_N):
 def find_order_of_magnitude(number):
     order = int(math.floor(math.log10(abs(number))))
     return abs(order)  
+
+# Function to transfer data to Cleber
+def copy_files_cleber(N, dim, alpha_a, alpha_g):
+    my_file = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/prop/properties_set.txt"
+    new_path = f"../../../raw_N_{N}/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/prop"
+    
+    # Create folder with file
+    if not os.path.exists(new_path):
+        os.makedirs(new_path)
+        # Copy file to /raw_N_{N}
+        shutil.copy(my_file, new_path)
+    else:
+        pass

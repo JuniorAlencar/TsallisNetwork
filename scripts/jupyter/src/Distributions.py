@@ -15,6 +15,7 @@ from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from sklearn.model_selection import train_test_split
 import shutil
 import math
+import re
 
 
 # create folder to results
@@ -31,8 +32,30 @@ def make_results_folders():
     else:
         pass
 
-# Return tuple (alpha_a,alpha_g)
+# Open the folder string name and return (alpha_a_value, alpha_g_value)
+def extract_alpha_values(folder_name):
+    pattern = r"alpha_a_(-?\d+\.\d+)_alpha_g_(-?\d+\.\d+)"
+    match = re.match(pattern, folder_name)
+    if match:
+        alpha_a = float(match.group(1))
+        alpha_g = float(match.group(2))
+        return (alpha_a, alpha_g)
+    else:
+        return None, None
+
+# List all pair of (alpha_a,alpha_g) folders in (N,dim) folder
 def list_all_folders(N,dim):
+    directory = f"../../data/N_{N}/dim_{dim}/"
+    lst_folders = []
+    for root, dirs, files in os.walk(directory):
+        lst_folders.append(dirs)
+    lst_folders = lst_folders[0]
+    set_parms = []
+
+    for i in range(len(lst_folders)):
+        set_parms.append(extract_alpha_values(lst_folders[i]))
+
+    return set_parms
     directory = f"../../data/N_{N}/dim_{dim}/"
     lst_folders = []
     for root, dirs, files in os.walk(directory):
@@ -69,7 +92,6 @@ def distribution(N, dim, alpha_a, alpha_g, degree, save):
         return k_real,p_real
     else:
         return k_real,p_real
- 
     
 
 def drop_zeros(a_list):
