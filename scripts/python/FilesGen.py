@@ -18,19 +18,13 @@ import pandas as pd
 
 N = 5000
 N_s = 100
-df = pd.read_csv("rest_parms.txt", delimiter = ' ')
-alpha_a = [round(i,2) for i in df["alpha_a"].values]
-alpha_g = [round(i,2) for i in df["alpha_g"].values]
-dim = [i for i in df["dim"].values]
-interval = range(0,int(len(alpha_a)))
-for i in interval:
-    print(f'{alpha_a[i]},{alpha_g[i]},{dim[i]}')
+df = pd.read_csv("new_data.csv", delimiter = ',')
+alpha_a = [i for i in df[df["dim"]==3]['alpha_a'].values]
+alpha_g = [i for i in df[df["dim"]==3]['alpha_g'].values]
+dim = [i for i in df[df["dim"]==3]['dim'].values]
 
-
-#for i in interval:
-    #FunctionsFile.JsonGenerate(N, alpha_a[i], alpha_g[i], dim[i])
-    #FunctionsFile.ScriptGenerate(N, alpha_a[i], alpha_g[i], dim[i], N_s)
-
-
+for i in range(len(dim)):
+    FunctionsFile.JsonGenerate(N, alpha_a[i], alpha_g[i], 3)
+    FunctionsFile.ScriptGenerate(N, alpha_a[i], alpha_g[i], 3, N_s)
                         
-#FunctionsFile.text_terminal()
+FunctionsFile.text_terminal()
