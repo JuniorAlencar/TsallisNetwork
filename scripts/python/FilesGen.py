@@ -15,7 +15,7 @@ import pandas as pd
 #         new_values = [multiplys[i]*j for j in d]
 #         list_values.append(new_values)
 #     return list_values
-
+'''
 N = 5000
 N_s = 100
 df = pd.read_csv("new_data.csv", delimiter = ',')
@@ -27,4 +27,18 @@ for i in range(len(dim)):
     FunctionsFile.JsonGenerate(N, alpha_a[i], alpha_g[i], 3)
     FunctionsFile.ScriptGenerate(N, alpha_a[i], alpha_g[i], 3, N_s)
                         
+FunctionsFile.text_terminal()
+'''
+'''
+N = [10000, 20000, 40000, 80000, 160000, 320000]
+N_s = [300, 175, 120, 42, 55, 10]
+alpha_a = 2.0
+alpha_g = [1.0, 2.0, 3.0, 4.0, 5.0]
+dim = [1,2,3,4]
+for i in range(len(N)):
+    for j in range(len(dim)):
+        for k in range(len(alpha_g)):
+            FunctionsFile.JsonGenerate(N[i], alpha_a, alpha_g[k], dim[j])
+            FunctionsFile.ScriptGenerate(N[i], alpha_a, alpha_g[k], dim[j], N_s[i])
+'''
 FunctionsFile.text_terminal()

@@ -12,14 +12,14 @@ __pycache__/
 .vscode
 /results/Network
 /data_new
-parms_pc_80000
-/parms_pc_100000
-scripts/N_100000_multithread_pc.sh
-scripts/python/multithread_assortativity_alpha_a.sh
-scripts/python/multithread_assortativity_alpha_g.sh
-parms_pc_40000
-scripts/N_40000_multithread_pc.sh
-/parms_pc_5000
+
+# Ignore parms to run multithread in PC
+parms_pc_*/
+
+# Ignore all shell scripts
+scripts/*.sh
+scripts/python/*.sh
+
 /data_2
 
 # Files
