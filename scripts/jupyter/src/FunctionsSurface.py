@@ -505,3 +505,61 @@ def copy_files_cleber(N, dim, alpha_a, alpha_g):
         shutil.copy(my_file, new_path)
     else:
         pass
+
+
+def min_values_df(df, Filter=False):
+    
+    if(Filter==True):
+        # Filter data to alpha_g >= 1
+        df_filter_g = df[df["alpha_g"] >= 1]
+        # Select unique values of alpha_g
+        alpha_g_min = df_filter_g['alpha_g'].unique()
+
+    else:
+        df_filter_g = df
+        alpha_g_min = df['alpha_g'].unique()
+
+    # load alpha_a_min index to propertie
+    alpha_a_min = []
+
+    # propertie_min
+    propertie_min = []
+    
+
+    headers = ['alpha_a_short','alpha_a_ass','alpha_a_diameter',
+                'dim','short_min','diameter_min','ass_coeff_min','short_err','diameter_err',
+                'ass_coeff_err']
+    
+    # Create other dataframe with same headers
+    data = pd.DataFrame(columns=headers)
+
+    dim = [1,2,3,4]
+    # assist to append elements in dataframe
+    pos = 0
+    
+    for d in dim:
+        df__ = df_filter_g[df_filter_g['dim']==d]
+        
+        for i in alpha_g_min:
+        
+            # Select index to min_value (assortativity, short and diameter)
+            index_min_ass = df__[df__['alpha_g'] == i]['ass_coeff_mean'].idxmin()
+            index_min_short = df__[df__['alpha_g'] == i]['short_mean'].idxmin()
+            index_min_diameter = df__[df__['alpha_g'] == i]['diameter_mean'].idxmin()
+            
+            data.loc[pos, 'alpha_g'] = i
+            data.loc[pos, 'alpha_a_short'] = df__['alpha_a'].loc[index_min_short]
+            data.loc[pos, 'alpha_a_diameter'] = df__['alpha_a'].loc[index_min_diameter]
+            data.loc[pos, 'alpha_a_ass'] = df__['alpha_a'].loc[index_min_ass]
+            data.loc[pos, 'dim'] = d
+            data.loc[pos, 'short_min'] = df__['short_mean'].loc[index_min_short]
+            data.loc[pos, 'ass_coeff_min'] = df__['ass_coeff_mean'].loc[index_min_ass]
+            data.loc[pos, 'diameter_min'] = df__['diameter_mean'].loc[index_min_diameter]
+            data.loc[pos, 'short_err'] = df__['short_err'].loc[index_min_short]
+            data.loc[pos, 'diameter_err'] = df__['diameter_err'].loc[index_min_diameter]
+            data.loc[pos, 'ass_coeff_err'] = df__['ass_coeff_err'].loc[index_min_ass]
+
+            pos += 1
+    
+    return data
+    
