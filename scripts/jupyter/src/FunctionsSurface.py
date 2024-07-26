@@ -104,11 +104,9 @@ def all_properties_dataframe(N, dim, alpha_a, alpha_g):
             # Folder empty, remove it
             shutil.rmtree(f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}")
 
-
-
 def all_properties_dataframe_2(N, dim, alpha_a, alpha_g):
     # Directory with all samples
-    path = f"../../data_2/N_{N}_111/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/prop"
+    path = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/prop"
     # All files with prop
     all_files = glob.glob(os.path.join(path,"*.csv"))
 
@@ -153,7 +151,7 @@ def all_properties_dataframe_2(N, dim, alpha_a, alpha_g):
         # Remove folder if /prop folder don't exist
         except OSError:
             # Folder empty, remove it
-            shutil.rmtree(f"../../data_2/N_{N}_111/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}")
+            shutil.rmtree(f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}")
                     
 
         if(count != 0):
@@ -201,7 +199,7 @@ def all_properties_dataframe_2(N, dim, alpha_a, alpha_g):
         # Remove folder if /prop folder don't exist
         except OSError:
             # Folder empty, remove it
-            shutil.rmtree(f"../../data_2/N_{N}_111/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}")
+            shutil.rmtree(f"../../data_2/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}")
 
 # Get the interval values
 def filter_dataframe(dataframe):
@@ -368,7 +366,6 @@ def list_all_folders_2d(N,dim):
 
     return set_parms
 
-
 # Create and save dataframe with Beta values (Propertie = Beta*log10(N) + Gamma)
 def beta_all(dataframe_filter, List_N):    
     # Dict to load beta_values with parameters
@@ -506,7 +503,7 @@ def copy_files_cleber(N, dim, alpha_a, alpha_g):
     else:
         pass
 
-
+# Mi
 def min_values_df(df, Filter=False):
     
     if(Filter==True):

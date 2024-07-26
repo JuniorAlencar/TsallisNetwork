@@ -5,40 +5,18 @@ import pandas as pd
 # FunctionsFile defined in folder ./src
 #ScriptGenerate(N,alpha_a,alpha_g,dim,NumSamples) -> generate files .sh to run in cluster
 #JsonGenerate(N, alpha_a, alpha_g, dim)              -> generate files .json for entry in script
-#text_terminal()                                -> return .txt with text to run codes in cluster
+#text_terminal()                                    -> return .txt with text to run codes in cluster
 #------------------------------------------------------------------------------------------
 
-# def alpha_a_values(d):
-#     list_values = []
-#     multiplys = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0]
-#     for i in range(len(multiplys)):
-#         new_values = [multiplys[i]*j for j in d]
-#         list_values.append(new_values)
-#     return list_values
-'''
-N = 5000
-N_s = 100
-df = pd.read_csv("new_data.csv", delimiter = ',')
-alpha_a = [i for i in df[df["dim"]==3]['alpha_a'].values]
-alpha_g = [i for i in df[df["dim"]==3]['alpha_g'].values]
-dim = [i for i in df[df["dim"]==3]['dim'].values]
+N = 10**5
+alpha_g = 2.0
+alpha_a = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+dim = [1,2,3,4]
+N_s = 120
 
 for i in range(len(dim)):
-    FunctionsFile.JsonGenerate(N, alpha_a[i], alpha_g[i], 3)
-    FunctionsFile.ScriptGenerate(N, alpha_a[i], alpha_g[i], 3, N_s)
+    for aa in alpha_a:
+        FunctionsFile.JsonGenerate(N, aa, alpha_g, dim[i])
+        FunctionsFile.ScriptGenerate(N, aa, alpha_g, dim[i], N_s)
                         
-FunctionsFile.text_terminal()
-'''
-'''
-N = [10000, 20000, 40000, 80000, 160000, 320000]
-N_s = [300, 175, 120, 42, 55, 10]
-alpha_a = 2.0
-alpha_g = [1.0, 2.0, 3.0, 4.0, 5.0]
-dim = [1,2,3,4]
-for i in range(len(N)):
-    for j in range(len(dim)):
-        for k in range(len(alpha_g)):
-            FunctionsFile.JsonGenerate(N[i], alpha_a, alpha_g[k], dim[j])
-            FunctionsFile.ScriptGenerate(N[i], alpha_a, alpha_g[k], dim[j], N_s[i])
-'''
 FunctionsFile.text_terminal()

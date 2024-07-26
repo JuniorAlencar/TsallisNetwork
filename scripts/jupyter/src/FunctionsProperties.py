@@ -25,185 +25,115 @@ def make_results_folders():
     else:
         pass
 
-def all_properties_dataframe(N, dim, alpha_a, alpha_g):
-    # Directory with all samples
+# All combinations (alpha_a, alpha_g) folders
+def extract_alpha_values(N, dim):
+    # Define the directory path
+    folder_name = f'../../data/N_{N}/dim_{dim}/'
+
+    # Define the pattern to match filenames
+    pattern = re.compile(r'alpha_a_(\d+(\.\d+)?)_alpha_g_(\d+(\.\d+)?)')
+
+    # Lists to store extracted combined values
+    combine_values = []
+
+    # Iterate over files in the directory
+    for filename in os.listdir(folder_name):
+        match = pattern.search(filename)
+        if match:
+            combine_values.append([float(match.group(1)), float(match.group(3))])
+
+    return combine_values
+
+# Create file with all samples
+def all_properties_file(N, dim, alpha_a, alpha_g):
     path = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/prop"
-    # All files with prop
     all_files = glob.glob(os.path.join(path,"*.csv"))
 
-    # dataframe with all samples
-    new_file = "/properties_set.txt"
+    file_all = "/properties_set.txt"
+
+    short_lst = []
+    diameter_lst = []
+    ass_coeff_lst = []
     
     print(f"N={N}, dim = {dim}, alpha_a = {alpha_a}, alpha_g = {alpha_g}")
     
-    # if file exist, check if is necessery d update
-    if(os.path.isfile(path + new_file) == True):
-        df_name = pd.read_csv(path+"/filenames.txt", sep=' ')
-        
-        # Data to create DataFrame
-        df_all = {"#short_path":[],
-                "#diamater":[],
-                "#ass_coeff":[]
-                }
-        file_names = []
-        
-        count = 0
-        
-        for file in all_files:
-            cond = os.path.basename(file) in df_name["filename"].values
-            if(cond == True):
-                pass
-            else:
-                df = pd.read_csv(file, sep=',')
-
-                df_all["#short_path"].append(df["#mean shortest path"].values[0])
-                df_all["#diamater"].append(df["# diamater"].values[0])
-                df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
-
-                file_names.append(os.path.basename(file))
-                count += 1
-
-        if(count != 0):
-            pall_df = pd.read_csv(path + "/properties_set.txt", sep=' ')
-            pall_df = pd.concat([pall_df, pd.DataFrame(data = df_all)], ignore_index=True)
-            df_name = pd.concat([df_name, pd.DataFrame(data = {"filename":file_names})], ignore_index=True)
-
-            pall_df.to_csv(path+"/properties_set.txt", sep = ' ', index = False, mode = "w+")
-            df_name.to_csv(path+"/filenames.txt", sep = ' ', index = False, mode = "w+")
-                
-        clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook
+    count = 0
+    num_files = len(all_files)
     
-    # file don't exist, create it
-    elif(os.path.isfile(path + new_file) == False):
-        n_values = 1
-        
-        # Data to create DataFrame
-        df_all = {"#short_path":[],
-                "#diamater":[],
-                "#ass_coeff":[]
-                }
-        file_names = []
+    for File in all_files:
+        with open(File, 'r') as file:
+            lines = file.readlines()
+            second_line = lines[1]
+            all_properties = [float(i) for i in second_line.strip().split(',')]
+            short_lst.append(all_properties[0])
+            diameter_lst.append(all_properties[1])
+            ass_coeff_lst.append(all_properties[2])
+        count += 1
+        print(f"{num_files} total files, {count} remaining files")
+    df_all = pd.DataFrame(data={"#short_path":short_lst, "#diamater":diameter_lst,"#ass_coeff":ass_coeff_lst})
+    df_all.to_csv(path + file_all, sep =  ' ', index = False, mode = 'w+')
+    clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook
 
-        for file in all_files:
-            df = pd.read_csv(file, sep=',')
-            df_all["#short_path"].append(df["#mean shortest path"].values[0])
-            df_all["#diamater"].append(df["# diamater"].values[0])
-            df_all["#ass_coeff"].append(df["#assortativity coefficient"].values[0])
-            file_names.append(os.path.basename(file))
-            print(f"{len(all_files)} files,{len(all_files) - n_values} remaning")
-            n_values += 1
-        df_prop = pd.DataFrame(data=df_all)
-        df_name = pd.DataFrame(data={"filename":file_names})
-        df_prop.to_csv(path+new_file,sep=' ', index=False, mode="w+")
-        df_name.to_csv(path+"/filenames.txt",sep=' ', index=False, mode="w+")
-        clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook
+# Join all files in one dataframe
+def all_data(N, dim):
+    N_lst = []
+    dim_lst = []
+    alpha_a_lst = []
+    alpha_g_lst = []
+    N_samples_lst = []
+    short_lst = []
+    short_err_lst = []
+    diameter_lst = []
+    diameter_err_lst = []
+    ass_coeff_lst = []
+    ass_coeff_err_lst = []
 
-
-
-# Open the folder string name and return (alpha_a_value, alpha_g_value)
-def extract_alpha_values(folder_name):
-    pattern = r"alpha_a_(-?\d+\.\d+)_alpha_g_(-?\d+\.\d+)"
-    match = re.match(pattern, folder_name)
-    if match:
-        alpha_a = float(match.group(1))
-        alpha_g = float(match.group(2))
-        return (alpha_a, alpha_g)
-    else:
-        return None, None
-
-# List all pair of (alpha_a,alpha_g) folders in (N,dim) folder
-def list_all_folders(N,dim):
-    directory = f"../../data/N_{N}/dim_{dim}/"
-    lst_folders = []
-    for root, dirs, files in os.walk(directory):
-        lst_folders.append(dirs)
-    lst_folders = lst_folders[0]
-    set_parms = []
-
-    for i in range(len(lst_folders)):
-        set_parms.append(extract_alpha_values(lst_folders[i]))
-
-    return set_parms
-
-def list_all_folders_for_alpha_fixed(N,dim, alpha_a, alpha_g, alpha_g_variable):
-    directory = f"../../data/N_{N}/dim_{dim}/"
-    lst_folders = []
-    for root, dirs, files in os.walk(directory):
-        lst_folders.append(dirs)
-    lst_folders = lst_folders[0]
-    
-    set_parms = []
-
-    for i in range(len(lst_folders)):
-        term_ = len(lst_folders[i])
-        if(term_ == 23):
-            set_parms.append((lst_folders[i][8:11],lst_folders[i][20:]))
-        if(term_== 24):
-            set_parms.append((lst_folders[i][8:12],lst_folders[i][21:]))
-
-    if(alpha_g_variable==True):
-        alpha_g_V = []
-        for i in range(len(set_parms)):
-            if(set_parms[i][0]==str(alpha_a)):
-                alpha_g_V.append(set_parms[i][1])
-        return alpha_g_V
-    else:
-        alpha_a_V = []
-        for i in range(len(set_parms)):
-            if(set_parms[i][1]==str(alpha_g)):
-                alpha_a_V.append(set_parms[i][0])  
-        return alpha_a_V
-
-# Create datarframe with alpha_g fixed and alpha_a variable or the other way around (N fixed)
-def create_all_properties_file(N,dim,alpha_a,alpha_g,alpha_g_variable):
-    if(alpha_g_variable==True):
-        mean_values = {"#alpha_g":[],"#short_mean":[],"#diamater_mean":[],
-                       "#ass_coeff_mean":[],"#short_err":[],"#diamater_err":[],
-                       "#ass_coeff_err":[],"#n_samples":[]}
-        
-        for i in alpha_g:
-            if(i==str(0.0)):
-                pass
-            else:
-                df = pd.read_csv(f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{i}/prop/properties_set.txt", sep=' ')
-                mean_values["#alpha_g"].append(i)
-                
-                mean_values["#short_mean"].append(df["#short_path"].mean())
-                mean_values["#diamater_mean"].append(df["#diamater"].mean())
-                mean_values["#ass_coeff_mean"].append(df["#ass_coeff"].mean())
-                
-                mean_values["#short_err"].append(df["#short_path"].sem())
-                mean_values["#diamater_err"].append(df["#diamater"].sem())
-                mean_values["#ass_coeff_err"].append(df["#ass_coeff"].sem())
-
-                mean_values["#n_samples"].append(len(df["#diamater"]))
-        
-        df_all = pd.DataFrame(data=mean_values)
-        sorted_df = df_all.sort_values(by='#alpha_g', key=lambda col: col.astype(float))  # Sort by converting to float
-        sorted_df.to_csv(f"../../data/N_{N}/dim_{dim}/properties_all_alpha_a_{alpha_a}.txt",sep = ' ',index=False,mode="w+")
-        
-    else:       
-        mean_values = {"#alpha_a":[],"#short_mean":[],"#diamater_mean":[],
-                "#ass_coeff_mean":[],"#short_err":[],"#diamater_err":[],
-                "#ass_coeff_err":[],"#n_samples":[]}
-
-        for i in alpha_a:
-            df = pd.read_csv(f"../../data/N_{N}/dim_{dim}/alpha_a_{i}_alpha_g_{alpha_g}/prop/properties_set.txt", sep=' ')
-            mean_values["#alpha_a"].append(i)
+    #print(f"N={N}, dim = {dim}, alpha_a = {alpha_a}, alpha_g = {alpha_g}")
+    for n in N:
+        for d in dim:
             
-            mean_values["#short_mean"].append(df["#short_path"].mean())
-            mean_values["#diamater_mean"].append(df["#diamater"].mean())
-            mean_values["#ass_coeff_mean"].append(df["#ass_coeff"].mean())
-            
-            mean_values["#short_err"].append(df["#short_path"].sem())
-            mean_values["#diamater_err"].append(df["#diamater"].sem())
-            mean_values["#ass_coeff_err"].append(df["#ass_coeff"].sem())
+            all_combinations_ag =  extract_alpha_values(n, d)
+            for i in range(len(all_combinations_ag)):
+                file = f"../../data/N_{n}/dim_{d}/alpha_a_{all_combinations_ag[i][0]}_alpha_g_{all_combinations_ag[i][1]}/prop/properties_set.txt"
+                
+                #if file no exist, create it
+                if not os.path.isfile(file):
+                    print("file not exist, running function all_properties")
+                    all_properties_file(n, d, all_combinations_ag[i][0], all_combinations_ag[i][1])
+                
+                try:
+                    df = pd.read_csv(file, sep=' ')
+                    # Number of nodes
+                    N_lst.append(n)
+                    dim_lst.append(d)
+                    
+                    # Alpha_a and Alpha_g values
+                    alpha_a_lst.append(all_combinations_ag[i][0])
+                    alpha_g_lst.append(all_combinations_ag[i][1])
+                    
+                    # Number of samples
+                    N_samples_lst.append(df['#short_path'].count())
+                    
+                    # Short_mean and Short_erro
+                    short_lst.append(df['#short_path'].mean())
+                    short_err_lst.append(df['#short_path'].sem())
+                    
+                    # Diameter_mean and diameter erro
+                    diameter_lst.append(df['#diamater'].mean())
+                    diameter_err_lst.append(df['#diamater'].sem())
+                    
+                    # Diameter_mean and diameter erro
+                    ass_coeff_lst.append(df['#ass_coeff'].mean())
+                    ass_coeff_err_lst.append(df['#ass_coeff'].sem())
+                except:
+                    print("data not found")
 
-            mean_values["#n_samples"].append(len(df["#diamater"]))
-        
-        df_all = pd.DataFrame(data=mean_values)
-        sorted_df = df_all.sort_values(by='#alpha_a', key=lambda col: col.astype(float))  # Sort by converting to float
-        sorted_df.to_csv(f"../../data/N_{N}/dim_{dim}/properties_all_alpha_g_{alpha_g}.txt",sep = ' ',index=False,mode="w+")
+    data_all = {"N":N_lst, "dim":dim_lst, "alpha_a":alpha_a_lst, "alpha_g":alpha_g_lst, 
+                "N_samples":N_samples_lst, "short_mean":short_lst, "short_err":short_err_lst, 
+                "diameter_mean":diameter_lst, "diameter_err":diameter_err_lst, "ass_coeff_mean":ass_coeff_lst, 
+                "ass_coeff_err":ass_coeff_err_lst}
+    df_all = pd.DataFrame(data=data_all)
+    df_all.to_csv("../../data/all_data.txt",sep=' ',index=False)
 
 
 # Linear regression with errors in parameters
@@ -254,152 +184,135 @@ def q(alpha_a,d):
         return (1/3)*np.exp(1-ration)+1
     
 
-def r_properties_dataframe(N, dim, alpha_a, alpha_g):
-    if(alpha_g==str(0.0)):
-        pass
-    else:
-        # Directory with all samples
-        path_d = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/gml/"
-        # dataframe with all samples
-        new_file = "/properties_set_r.txt"
+# def r_properties_dataframe(N, dim, alpha_a, alpha_g):
+#     if(alpha_g==str(0.0)):
+#         pass
+#     else:
+#         # Directory with all samples
+#         path_d = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/gml/"
+#         # dataframe with all samples
+#         new_file = "/properties_set_r.txt"
 
-        # Check if directory exist
-        conditional_ = os.path.exists(path_d)
-        if(conditional_ == True):
-            pass
-        else:
-            print("data doesn't exist, run code in c++ to gen data")
+#         # Check if directory exist
+#         conditional_ = os.path.exists(path_d)
+#         if(conditional_ == True):
+#             pass
+#         else:
+#             print("data doesn't exist, run code in c++ to gen data")
 
-        # Check if file exist
-        check_file = os.path.isfile(path_d+new_file)
+#         # Check if file exist
+#         check_file = os.path.isfile(path_d+new_file)
 
-        # Open all files path in directory .csv
-        all_files = glob.glob(os.path.join(path_d,"*.gz"))
-        # If file exist, open
-        if(check_file == True):
-            df = pd.read_csv(path_d+new_file,sep=" ")
-            #filter_list to check if files are in dataframe
-            filter_list = str(df["#cod_file"].values) 
-            num_samples = len(df)
-            for file in all_files:
-                # Check if file are in dataframe
-                conditional = os.path.basename(file)[4:-7] in filter_list
-                # Make nothing if True conditional
-                if(conditional==True):
-                    pass
-                # Add new elements in dataframe
-                else:
-                    # load node properties
-                    node = {"id": [],
-                    "position":[],
-                    "degree": []}
+#         # Open all files path in directory .csv
+#         all_files = glob.glob(os.path.join(path_d,"*.gz"))
+#         # If file exist, open
+#         if(check_file == True):
+#             df = pd.read_csv(path_d+new_file,sep=" ")
+#             #filter_list to check if files are in dataframe
+#             filter_list = str(df["#cod_file"].values) 
+#             num_samples = len(df)
+#             for file in all_files:
+#                 # Check if file are in dataframe
+#                 conditional = os.path.basename(file)[4:-7] in filter_list
+#                 # Make nothing if True conditional
+#                 if(conditional==True):
+#                     pass
+#                 # Add new elements in dataframe
+#                 else:
+#                     # load node properties
+#                     node = {"id": [],
+#                     "position":[],
+#                     "degree": []}
                     
-                    # load edge properties
-                    edge = {"connections": [],
-                            "distance": []}
+#                     # load edge properties
+#                     edge = {"connections": [],
+#                             "distance": []}
                     
-                    with gzip.open(file) as file_in:
-                        String = file_in.readlines()
-                        Lines = [i.decode('utf-8') for i in String]
-                        for i in range(len(Lines)):
-                            if(Lines[i]=='node\n'):
-                                node["id"].append(int(Lines[i+2][4:-2]))
-                                node["position"].append([float(Lines[i+6][2:-1]),float(Lines[i+7][2:-1]),float(Lines[i+8][2:-1])])
-                                if(Lines[i+9][0]=='q'):
-                                    node["degree"].append(int(Lines[i+10][7:-1]))
-                                else:
-                                    node["degree"].append(int(Lines[i+9][7:-1]))
-                            elif(Lines[i]=="edge\n"):
-                                edge["connections"].append([int(Lines[i+2][8:-2]),int(Lines[i+3][8:-2])])
-                                edge["distance"].append(float(Lines[i+4][9:-1]))
+#                     with gzip.open(file) as file_in:
+#                         String = file_in.readlines()
+#                         Lines = [i.decode('utf-8') for i in String]
+#                         for i in range(len(Lines)):
+#                             if(Lines[i]=='node\n'):
+#                                 node["id"].append(int(Lines[i+2][4:-2]))
+#                                 node["position"].append([float(Lines[i+6][2:-1]),float(Lines[i+7][2:-1]),float(Lines[i+8][2:-1])])
+#                                 if(Lines[i+9][0]=='q'):
+#                                     node["degree"].append(int(Lines[i+10][7:-1]))
+#                                 else:
+#                                     node["degree"].append(int(Lines[i+9][7:-1]))
+#                             elif(Lines[i]=="edge\n"):
+#                                 edge["connections"].append([int(Lines[i+2][8:-2]),int(Lines[i+3][8:-2])])
+#                                 edge["distance"].append(float(Lines[i+4][9:-1]))
                     
-                    D = np.array(node["degree"])
-                    getcontext().prec = 50  # Set precision to 50 decimal places
-                    Ter_1 = Decimal(int(sum(D)))
-                    Ter_3 = Decimal(int(np.dot(D,D)))
-                    Ter_4 = Decimal(int(sum(D**3)))
+#                     D = np.array(node["degree"])
+#                     getcontext().prec = 50  # Set precision to 50 decimal places
+#                     Ter_1 = Decimal(int(sum(D)))
+#                     Ter_3 = Decimal(int(np.dot(D,D)))
+#                     Ter_4 = Decimal(int(sum(D**3)))
                     
-                    G = nx.from_edgelist(edge["connections"])
-                    Ter_2 = 0
+#                     G = nx.from_edgelist(edge["connections"])
+#                     Ter_2 = 0
                     
-                    for j in G.edges():
-                        d_s = G.degree[j[0]]
-                        d_t = G.degree[j[1]]
-                        Ter_2 += d_s*d_t 
+#                     for j in G.edges():
+#                         d_s = G.degree[j[0]]
+#                         d_t = G.degree[j[1]]
+#                         Ter_2 += d_s*d_t 
                     
-                    Ter_2 = Decimal(Ter_2)
+#                     Ter_2 = Decimal(Ter_2)
                     
-                    getcontext().prec = 10  # Set precision to 50 decimal places
+#                     getcontext().prec = 10  # Set precision to 50 decimal places
                     
-                    r = Decimal((Ter_1*Ter_2-Ter_3*2)/(Ter_1*Ter_4-Ter_3**2))
-                    df.loc[num_samples,"#ass_coeff"] = r
-                    df.loc[num_samples,"#cod_file"] = os.path.basename(file)[4:-7]
-                    num_samples += 1
-            # Save new dataframe update
-            df["#cod_file"] = df["#cod_file"].astype(int)
-            df.to_csv(path_d+new_file,sep=' ',index=False)
+#                     r = Decimal((Ter_1*Ter_2-Ter_3*2)/(Ter_1*Ter_4-Ter_3**2))
+#                     df.loc[num_samples,"#ass_coeff"] = r
+#                     df.loc[num_samples,"#cod_file"] = os.path.basename(file)[4:-7]
+#                     num_samples += 1
+#             # Save new dataframe update
+#             df["#cod_file"] = df["#cod_file"].astype(int)
+#             df.to_csv(path_d+new_file,sep=' ',index=False)
 
-        # Else, create it
-        else:
-            ass_coeff = []
-            cod_file = []
-            # Open all files path in directory .csv
+#         # Else, create it
+#         else:
+#             ass_coeff = []
+#             cod_file = []
+#             # Open all files path in directory .csv
             
-            for file in all_files:
-                node = {"id": [],
-                    "position":[],
-                    "degree": []}
-                edge = {"connections": [],
-                        "distance": []}
-                with gzip.open(file) as file_in:
-                    String = file_in.readlines()
-                    Lines = [i.decode('utf-8') for i in String]
-                    for i in range(len(Lines)):
-                        if(Lines[i]=='node\n'):
-                            node["id"].append(int(Lines[i+2][4:-2]))
-                            node["position"].append([float(Lines[i+6][2:-1]),float(Lines[i+7][2:-1]),float(Lines[i+8][2:-1])])
-                            if(Lines[i+9][0]=='q'):
-                                node["degree"].append(int(Lines[i+10][7:-1]))
-                            else:
-                                node["degree"].append(int(Lines[i+9][7:-1]))
-                        elif(Lines[i]=="edge\n"):
-                            edge["connections"].append([int(Lines[i+2][8:-2]),int(Lines[i+3][8:-2])])
-                            edge["distance"].append(float(Lines[i+4][9:-1]))
-                D = np.array(node["degree"])
-                getcontext().prec = 50  # Set precision to 50 decimal places
-                Ter_1 = Decimal(int(sum(D)))
-                Ter_3 = Decimal(int(np.dot(D,D)))
-                Ter_4 = Decimal(int(sum(D**3)))
-                G = nx.from_edgelist(edge["connections"])
-                Ter_2 = 0
-                for j in G.edges():
-                    d_s = G.degree[j[0]]
-                    d_t = G.degree[j[1]]
-                    Ter_2 += d_s*d_t 
-                Ter_2 = Decimal(Ter_2)
-                getcontext().prec = 10  # Set precision to 50 decimal places
-                r = Decimal((Ter_1*Ter_2-Ter_3*2)/(Ter_1*Ter_4-Ter_3**2))
-                ass_coeff.append(r)
-                cod_file.append(os.path.basename(file)[4:-7])
-            df = pd.DataFrame(data={"#ass_coeff":ass_coeff,"#cod_file":cod_file})
-            df.to_csv(path_d+new_file,sep=' ',index=False)
-
-def list_N_folders():
-    directory = f"../../data/"
-    lst_folders = []
-    for root, dirs, files in os.walk(directory):
-        lst_folders.append(dirs)
-    dif = lst_folders[0]
-    diff_N = [i[2:] for i in dif]
-    run_second_time = 'operties_N' in diff_N
-    
-    if(run_second_time == True):
-        diff_N.remove('operties_N')
-    
-    diff_N.remove(str(100000))
-    diff_N.sort(key=int)
-    #diff_N.remove(str(100000))
-    return diff_N
+#             for file in all_files:
+#                 node = {"id": [],
+#                     "position":[],
+#                     "degree": []}
+#                 edge = {"connections": [],
+#                         "distance": []}
+#                 with gzip.open(file) as file_in:
+#                     String = file_in.readlines()
+#                     Lines = [i.decode('utf-8') for i in String]
+#                     for i in range(len(Lines)):
+#                         if(Lines[i]=='node\n'):
+#                             node["id"].append(int(Lines[i+2][4:-2]))
+#                             node["position"].append([float(Lines[i+6][2:-1]),float(Lines[i+7][2:-1]),float(Lines[i+8][2:-1])])
+#                             if(Lines[i+9][0]=='q'):
+#                                 node["degree"].append(int(Lines[i+10][7:-1]))
+#                             else:
+#                                 node["degree"].append(int(Lines[i+9][7:-1]))
+#                         elif(Lines[i]=="edge\n"):
+#                             edge["connections"].append([int(Lines[i+2][8:-2]),int(Lines[i+3][8:-2])])
+#                             edge["distance"].append(float(Lines[i+4][9:-1]))
+#                 D = np.array(node["degree"])
+#                 getcontext().prec = 50  # Set precision to 50 decimal places
+#                 Ter_1 = Decimal(int(sum(D)))
+#                 Ter_3 = Decimal(int(np.dot(D,D)))
+#                 Ter_4 = Decimal(int(sum(D**3)))
+#                 G = nx.from_edgelist(edge["connections"])
+#                 Ter_2 = 0
+#                 for j in G.edges():
+#                     d_s = G.degree[j[0]]
+#                     d_t = G.degree[j[1]]
+#                     Ter_2 += d_s*d_t 
+#                 Ter_2 = Decimal(Ter_2)
+#                 getcontext().prec = 10  # Set precision to 50 decimal places
+#                 r = Decimal((Ter_1*Ter_2-Ter_3*2)/(Ter_1*Ter_4-Ter_3**2))
+#                 ass_coeff.append(r)
+#                 cod_file.append(os.path.basename(file)[4:-7])
+#             df = pd.DataFrame(data={"#ass_coeff":ass_coeff,"#cod_file":cod_file})
+#             df.to_csv(path_d+new_file,sep=' ',index=False)
 
 # Create datarframe with alpha_g fixed and alpha_a variable or the other way around (N fixed)
 def properties_dim_N(N, dim, alpha_g_variable):
@@ -576,31 +489,6 @@ def reset_files(N,dim,alpha_g,alpha_a):
     path = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/properties_set.txt"
     if(os.path.exists(path)==True):
         os.remove(path)
-    else:
-        pass
-
-def filter_alpha_g(alpha_g, propertie, err_propertie):
-    alpha_g_filter, propertie_filter,propertie_err_filter = [],[],[]
-    
-    for i in range(len(alpha_g)):
-        if(alpha_g[i]>1.0):
-            alpha_g_filter.append(alpha_g[i])
-            propertie_filter.append(propertie[i])
-            propertie_err_filter.append(err_propertie[i])
-    alpha_g_filter, propertie_filter, propertie_err_filter = np.array(alpha_g_filter), np.array(propertie_filter), np.array(propertie_err_filter)
-    return alpha_g_filter, propertie_filter, propertie_err_filter
-
-# reset folders properties
-def reset_folders(N, dim, alpha_a, alpha_g):
-    path_check = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/prop_check"
-    path_prop = f"../../data/N_{N}/dim_{dim}/alpha_a_{alpha_a}_alpha_g_{alpha_g}/"
-    
-    all_files_check = glob.glob(os.path.join(path_check,"*.csv"))
-    
-    if(len(all_files_check)!=0):
-        
-        for file in all_files_check:
-            shutil.move(file, path_prop + os.path.basename(file))
     else:
         pass
 
