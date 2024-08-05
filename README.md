@@ -16,10 +16,19 @@ A BFS (Breadth First Search) algorithm was implemented to calculate the shortest
 
 - g++ compile
 
-- json library
+- nlohmann library (json files)
 
--boost library
+- boost library
 
 - eigen3lib library
 
 - zlib library
+
+## Running code
+```bash
+# Comando a ser executado
+echo "Hello, World!"
+
+# Saída esperada
+Hello, World!
+
