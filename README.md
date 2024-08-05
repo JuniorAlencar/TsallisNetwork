@@ -37,3 +37,6 @@ make
 
 # The exe1 executable will be generated, the input parameters must be the standard expressed in example.json. To execute the code, we must follow the pattern
 path_to_executable/exe1 path_to_json/example.json
+
+## Data
+The data will be stored in <b>/gml_folde</b> and <b>/prop_folder</b>, where the gml file stores all the link pairs in the network, with the Euclidean distance between the site pairs and the degree of each site. While the prop file stores the value of the properties shortest average network path, network diameter and assortativity by degree
