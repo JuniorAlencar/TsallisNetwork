@@ -9,3 +9,15 @@ A BFS (Breadth First Search) algorithm was implemented to calculate the shortest
 <p>
   <a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.89.208701">Assortative Mixing in Networks</a>.
 </p>
+
+
+## Requirements
+*cmake
+*g++ compile
+*json library
+<p>
+  <a href="https://www.boost.org/">library</a>.
+</p>
+*eigen3lib library
+*boost library
+*zlib lirary
