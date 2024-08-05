@@ -26,7 +26,6 @@ scripts/python/*.sh
 
 # Files
 /scripts/run_all_script.txt
-.gitattributes
 
 # Ignore all folders
 **/_checkpoints/
