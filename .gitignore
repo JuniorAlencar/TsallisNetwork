@@ -1,18 +1,13 @@
 # Folders
-__pycache__/
-
-/presentation
+/presentation/*
 /new_data
 /parms_pc
 /results
-/data_teste
 /scripts/multithread
 /build
 /parms
 /data
 .vscode
-/results/Network
-/data_new
 
 
 # Ignore parms to run multithread in PC
@@ -28,9 +23,7 @@ scripts/python/*.sh
 /scripts/run_all_script.txt
 
 # Ignore all folders
-**/_checkpoints/
-**/__pycache__/
-
+*.pyc
 
 
 
