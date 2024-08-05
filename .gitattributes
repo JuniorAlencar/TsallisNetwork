@@ -2,3 +2,5 @@
 *.py linguist-language=Python
 *.ipynb linguist-language=Jupyter
 *.cpp linguist-language=C++
+*.sh linguist-language=shell script
+*.bin linguist-vendored
