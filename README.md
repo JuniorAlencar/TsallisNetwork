@@ -26,12 +26,16 @@ A BFS (Breadth First Search) algorithm was implemented to calculate the shortest
 
 ## Running code
 ```bash
+
 # Navigate to the folder where the clone was made
 cd TsallisNetwork
+
 # Create build folder to generate executable
 mkdir build && cd build
+
 # Generate the cmake files
 cmake ...
+
 # Generate the executable
 make
 
