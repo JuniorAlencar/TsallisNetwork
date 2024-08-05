@@ -18,8 +18,8 @@ A BFS (Breadth First Search) algorithm was implemented to calculate the shortest
 
 - json library
 
-- <p> <a href="https://www.boost.org/">boost library</a>. </p>
+-boost library
 
 - eigen3lib library
 
-- zlib lirary
+- zlib library
