@@ -12,9 +12,14 @@ A BFS (Breadth First Search) algorithm was implemented to calculate the shortest
 
 
 ## Requirements
-Markup : *cmake\\
-Markup : *g++ compile\\
-Markup : *json library\\
-Markup : <p> <a href="https://www.boost.org/">*boost library</a>. </p>\\
-Markup : *eigen3lib library\\
-Markup : *zlib lirary\\
+Markup : *cmake
+
+Markup : *g++ compile
+
+Markup : *json library
+
+Markup : <p> <a href="https://www.boost.org/">*boost library</a>. </p>
+
+Markup : *eigen3lib library
+
+Markup : *zlib lirary
