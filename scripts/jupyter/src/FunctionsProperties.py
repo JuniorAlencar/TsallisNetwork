@@ -135,7 +135,6 @@ def all_data(N, dim):
     df_all = pd.DataFrame(data=data_all)
     df_all.to_csv("../../data/all_data.txt",sep=' ',index=False)
 
-
 # Linear regression with errors in parameters
 def linear_regression(X,Y,Erro_Y,Parameter):
     # Dados de exemplo
@@ -152,7 +151,7 @@ def linear_regression(X,Y,Erro_Y,Parameter):
     slope = coefficients[0]
     intercept = coefficients[1]
     slope_error = np.sqrt(cov_matrix[0, 0])
-    intercept_error = np.sqrt(cov_matrix[1, 1])
+    intercept_error = abs(np.sqrt(cov_matrix[1, 1]))
     
     # Return a, b, a_err, b_err
     if( Parameter == True):
@@ -161,6 +160,72 @@ def linear_regression(X,Y,Erro_Y,Parameter):
     # Return y, where y = a*x + b
     else:
         return intercept + slope*x
+
+# dataframe with all beta, xi parameters, with relative erros
+# Prop = beta(alpha_a, alpha_g, dim)*ln(N) + xi(alpha_a, alpha_g, dim)
+def beta_all(df_all, alpha_filter, dimensions, alpha_a_variable):
+    dim_lst = []
+    alpha_a_lst = []
+    alpha_g_lst = []
+
+    # Prop = beta(alpha_a, alpha_g, d)ln(N) + xi(alpha_a, alpha_g, d)
+
+    beta_short_lst = []
+    beta_short_err_lst = []
+    xi_short_lst = []
+    xi_short_err_lst = []
+
+    beta_ass_coeff_lst = []
+    beta_ass_coeff_err_lst = []
+    xi_ass_coeff_lst = []
+    xi_ass_coeff_err_lst = []
+
+    sub_df = pd.DataFrame(columns=df_all.columns)
+    
+    if(alpha_a_variable == True):
+        for aa in alpha_filter:
+            join = df_all[(df_all['alpha_g'] == 2.0) & (df_all['alpha_a'] == aa)]
+            sub_df = pd.concat([sub_df,join], axis=0)
+        prop = 'alpha_a'
+
+    else:
+        for ag in alpha_filter:
+            join = df_all[(df_all['alpha_g'] == ag) & (df_all['alpha_a'] == 2.0)]
+            sub_df = pd.concat([sub_df,join], axis=0)
+        prop = 'alpha_g'
+    
+    for i in range(len(dimensions)):
+        
+        sub_dim = sub_df[sub_df['dim']==dimensions[i]]
+        
+        for aa in range(len(alpha_filter)):
+        
+            df_alpha = sub_dim[sub_dim[prop]==alpha_filter[aa]]
+            
+            logN = np.log10(pd.to_numeric(df_alpha['N']))
+            
+            parameters_short = linear_regression(logN, df_alpha['short_mean'], df_alpha['short_err'],Parameter=True)
+            parameters_ass_coeff = linear_regression(logN, df_alpha['ass_coeff_mean'], df_alpha['ass_coeff_err'],Parameter=True)
+            
+            dim_lst.append(dimensions[i])
+            #value_iloc = df.iloc[aa, df.columns.get_loc('B')]
+            alpha_a_lst.append(round(sub_dim['alpha_a'],2))
+            alpha_g_lst.append(2.0)
+
+            beta_short_lst.append(parameters_short[0])
+            beta_short_err_lst.append(parameters_short[2])
+            xi_short_lst.append(parameters_short[1])
+            xi_short_err_lst.append(parameters_short[3])
+
+            beta_ass_coeff_lst.append(parameters_ass_coeff[0])
+            beta_ass_coeff_err_lst.append(parameters_ass_coeff[2])
+            xi_ass_coeff_lst.append(parameters_ass_coeff[1])
+            xi_ass_coeff_err_lst.append(parameters_ass_coeff[3])
+
+    beta_all = pd.DataFrame(data={"dim":dim_lst, "alpha_a":alpha_a_lst, "alpha_g":alpha_g_lst, "beta_short":beta_short_lst,"beta_short_err":beta_short_err_lst,
+                                "xi_short":xi_short_lst,"xi_short_err":xi_short_err_lst,"beta_ass_coeff":beta_ass_coeff_lst,"beta_ass_coeff_err":beta_ass_coeff_err_lst,
+                                "xi_ass_coeff":xi_ass_coeff_lst, "xi_ass_coeff_err":xi_ass_coeff_err_lst})
+    beta_all.to_csv("../../data/parameters_all.txt",sep=' ',index=False)
 
 def kappa(alpha_a,d):
     ration = alpha_a/d

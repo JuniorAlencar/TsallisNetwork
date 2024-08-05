@@ -1,6 +1,7 @@
 # Folders
 __pycache__/
 
+/presentation
 /new_data
 /parms_pc
 /results
@@ -13,6 +14,7 @@ __pycache__/
 /results/Network
 /data_new
 
+
 # Ignore parms to run multithread in PC
 parms_pc_*/
 
@@ -24,6 +26,11 @@ scripts/python/*.sh
 
 # Files
 /scripts/run_all_script.txt
+.gitattributes
+
+# Ignore all folders
+**/_checkpoints/
+**/__pycache__/
 
 
 
