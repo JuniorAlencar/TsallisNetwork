@@ -26,9 +26,14 @@ A BFS (Breadth First Search) algorithm was implemented to calculate the shortest
 
 ## Running code
 ```bash
-# Comando a ser executado
-echo "Hello, World!"
+# Navigate to the folder where the clone was made
+cd TsallisNetwork
+# Create build folder to generate executable
+mkdir build && cd build
+# Generate the cmake files
+cmake ...
+# Generate the executable
+make
 
-# Saída esperada
-Hello, World!
-
+# The exe1 executable will be generated, the input parameters must be the standard expressed in example.json. To execute the code, we must follow the pattern
+path_to_executable/exe1 path_to_json/example.json
