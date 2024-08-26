@@ -75,7 +75,7 @@ def all_properties_file(N, dim, alpha_a, alpha_g):
     clear_output()  # Set wait=True if you want to clear the output without scrolling the notebook
 
 # Join all files in one dataframe
-def all_data(N, dim):
+def all_data(N, dim, num):
     N_lst = []
     dim_lst = []
     alpha_a_lst = []
@@ -132,8 +132,9 @@ def all_data(N, dim):
                 "N_samples":N_samples_lst, "short_mean":short_lst, "short_err":short_err_lst, 
                 "diameter_mean":diameter_lst, "diameter_err":diameter_err_lst, "ass_coeff_mean":ass_coeff_lst, 
                 "ass_coeff_err":ass_coeff_err_lst}
+    
     df_all = pd.DataFrame(data=data_all)
-    df_all.to_csv("../../data/all_data.txt",sep=' ',index=False)
+    df_all.to_csv(f"../../data/all_data_{num}.txt",sep=' ',index=False)
 
 # Linear regression with errors in parameters
 def linear_regression(X,Y,Erro_Y,Parameter):

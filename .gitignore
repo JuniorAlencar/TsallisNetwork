@@ -6,7 +6,7 @@
 /scripts/multithread
 /build
 /parms
-/data
+/data/N_*
 .vscode
 
 
