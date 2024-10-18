@@ -1,6 +1,6 @@
 from src.CompileFunctions import *
 
-foldername = 'BoltzmannMachine'
+foldername = 'TsallisNetwork/data/N_5000'
 # Caminho de origem (pasta a ser compilada)
 source_dir = Path(f'~/Documents/{foldername}').expanduser()
 
